@@ -5,16 +5,26 @@ import path from 'path'
 import readline from 'readline'
 
 export const automatic = (
-    waitTime: number = 10000,
-    branch: string = 'master',
-    repoUrl?: string,
-    sourceFolderPath: string = process.cwd(),
-    isNeedDefaultProcess?: boolean
+    {
+        waitTime = 10000,
+        branch = 'master',
+        repoUrl,
+        sourceFolderPath,
+        isNeedDefaultProcess,
+        rebase = false
+    }: {
+        waitTime: number,
+        branch: string,
+        repoUrl?: string,
+        sourceFolderPath: string,
+        isNeedDefaultProcess?: boolean,
+        rebase: boolean
+    }
 ) => {
     let updater = new Update()
 
     if (sourceFolderPath === undefined)
-        sourceFolderPath = path.join(process.argv[1], '../')
+        sourceFolderPath = process.cwd()
 
     if (isNeedDefaultProcess == true || isNeedDefaultProcess == undefined) {
         updater.events.on(
@@ -179,7 +189,7 @@ export const automatic = (
             webVersion: webGitInfo.version
         }
 
-        if (webGitInfo.version == localGitInfo.version || webGitInfo.version == null) {
+        if (!rebase && (webGitInfo.version == localGitInfo.version || webGitInfo.version == null)) {
             updater.events.emit(
                 getEventSignal('alreadyHighestVersion'),
                 eventInfo

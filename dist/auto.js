@@ -5,15 +5,12 @@ var tslib_1 = require("tslib");
 var update_1 = require("./update/update");
 var eventSignal_1 = require("./update/eventSignal");
 var logger_1 = require("./logger");
-var path_1 = tslib_1.__importDefault(require("path"));
 var readline_1 = tslib_1.__importDefault(require("readline"));
-exports.automatic = function (waitTime, branch, repoUrl, sourceFolderPath, isNeedDefaultProcess) {
-    if (waitTime === void 0) { waitTime = 10000; }
-    if (branch === void 0) { branch = 'master'; }
-    if (sourceFolderPath === void 0) { sourceFolderPath = process.cwd(); }
+exports.automatic = function (_a) {
+    var _b = _a.waitTime, waitTime = _b === void 0 ? 10000 : _b, _c = _a.branch, branch = _c === void 0 ? 'master' : _c, repoUrl = _a.repoUrl, sourceFolderPath = _a.sourceFolderPath, isNeedDefaultProcess = _a.isNeedDefaultProcess, _d = _a.rebase, rebase = _d === void 0 ? false : _d;
     var updater = new update_1.Update();
     if (sourceFolderPath === undefined)
-        sourceFolderPath = path_1.default.join(process.argv[1], '../');
+        sourceFolderPath = process.cwd();
     if (isNeedDefaultProcess == true || isNeedDefaultProcess == undefined) {
         updater.events.on(eventSignal_1.getEventSignal('newVersionDetected'), function (eventInfo) {
             updater.getNewestGitHubCommit(function (data) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
@@ -120,8 +117,11 @@ exports.automatic = function (waitTime, branch, repoUrl, sourceFolderPath, isNee
     var webGitInfoCallback = function (webGitInfo) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
         var eventInfo;
         return tslib_1.__generator(this, function (_a) {
+            console.log('hi2?');
+            console.log(webGitInfo);
             if (webGitInfo.type != "git")
                 return [2 /*return*/];
+            console.log('hi3?');
             eventInfo = {
                 repoUrl: repoUrl,
                 sourceFolderPath: sourceFolderPath,
@@ -129,7 +129,7 @@ exports.automatic = function (waitTime, branch, repoUrl, sourceFolderPath, isNee
                 localVersion: localGitInfo.version,
                 webVersion: webGitInfo.version
             };
-            if (webGitInfo.version == localGitInfo.version || webGitInfo.version == null) {
+            if (!rebase && (webGitInfo.version == localGitInfo.version || webGitInfo.version == null)) {
                 updater.events.emit(eventSignal_1.getEventSignal('alreadyHighestVersion'), eventInfo);
             }
             else {

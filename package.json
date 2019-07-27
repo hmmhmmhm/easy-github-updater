@@ -1,9 +1,10 @@
 {
   "name": "easy-github-updater",
   "version": "1.0.0",
-  "description": "프로젝트설명",
+  "description": "🚀 Github auto-updater of built available into node project.",
   "main": "dist/index.js",
   "scripts": {
+    "test": "node ./test",
     "lint": "eslint --fix -c ./.eslintrc.json --ext .ts ."
   },
   "keywords": [],
@@ -19,5 +20,9 @@
     "adm-zip": "^0.4.13",
     "eslint": "^6.1.0",
     "ts-node": "^8.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hmmhmmhm/easy-github-updater.git"
   }
 }
