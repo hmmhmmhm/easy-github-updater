@@ -30,7 +30,7 @@ export const automatic = (
         updater.events.on(
             getEventSignal('newVersionDetected'),
             (eventInfo) => {
-                updater.getNewestGitHubCommit( async (data) => {
+                updater.getNewestGitHubCommit(eventInfo.repoUrl, async (data) => {
 
                     if(!data) return
 
@@ -182,9 +182,9 @@ export const automatic = (
         if (webGitInfo.type != "git") return
 
         let eventInfo = {
-            repoUrl: repoUrl,
-            sourceFolderPath: sourceFolderPath,
-            branch: branch,
+            repoUrl,
+            sourceFolderPath,
+            branch,
             localVersion: localGitInfo.version,
             webVersion: webGitInfo.version
         }

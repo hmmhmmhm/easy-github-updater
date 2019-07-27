@@ -206,16 +206,16 @@ var Update = /** @class */ (function () {
         };
         this.events.emit(eventSignal_1.getEventSignal('projectExtractComplete'), eventInfo);
     };
-    Update.prototype.getNewestGitHubCommit = function (callback) {
+    Update.prototype.getNewestGitHubCommit = function (repoUrl, callback) {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
             var _this = this;
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getGitHubCommits(function (body) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
+                    case 0: return [4 /*yield*/, this.getGitHubCommits(repoUrl, function (body) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
                             return tslib_1.__generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
-                                        if (!!body) return [3 /*break*/, 2];
+                                        if (!(!body || typeof body[0] == 'undefined' || typeof body[0]['commit'] == 'undefined')) return [3 /*break*/, 2];
                                         return [4 /*yield*/, callback()];
                                     case 1:
                                         _a.sent();
@@ -238,16 +238,14 @@ var Update = /** @class */ (function () {
             });
         });
     };
-    Update.prototype.getGitHubCommits = function (callback) {
+    Update.prototype.getGitHubCommits = function (repoUrl, callback) {
         var _this = this;
         var options = {
             hostname: 'api.github.com',
             port: 443,
-            path: '/repos/organization/minejs/commits',
+            path: ("/repos/" + repoUrl.split("github.com/")[1].split(".git")[0] + "/commits").replace('//', '/'),
             method: 'GET',
-            headers: {
-                'user-agent': 'DeployGithub'
-            }
+            headers: { 'user-agent': 'easy-github-updater' }
         };
         return new Promise(function (resolve) {
             var body = '';

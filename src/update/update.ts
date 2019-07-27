@@ -61,7 +61,6 @@ export class Update {
         }) => Promise<void>
     ){
         await this.getWebPackageJson(repoUrl, branch, async (packageJson) => {
-
             let type = '',
                 version = ''
 
@@ -234,9 +233,9 @@ export class Update {
         )
     }
 
-    async getNewestGitHubCommit(callback: (data?: {message; name; date}) => Promise<void>) {
-        await this.getGitHubCommits(async (body) => {
-            if(!body){
+    async getNewestGitHubCommit(repoUrl: string, callback: (data?: {message, name, date}) => Promise<void>) {
+        await this.getGitHubCommits(repoUrl, async (body) => {
+            if(!body || typeof body[0] == 'undefined' || typeof body[0]['commit'] =='undefined'){
                 await callback()
                 return
             }
@@ -248,15 +247,13 @@ export class Update {
         })
     }
 
-    getGitHubCommits(callback: (data?: any) => Promise<void>) {
+    getGitHubCommits(repoUrl: string, callback: (data?: any) => Promise<void>) {
         let options = {
             hostname: 'api.github.com',
             port: 443,
-            path: '/repos/organization/minejs/commits',
+            path: `/repos/${repoUrl.split(`github.com/`)[1].split(`.git`)[0]}/commits`.replace('//', '/'),
             method: 'GET',
-            headers: {
-                'user-agent': 'DeployGithub'
-            }
+            headers: { 'user-agent': 'easy-github-updater' }
         }
 
         return new Promise((resolve)=>{

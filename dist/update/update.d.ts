@@ -15,10 +15,10 @@ export declare class Update {
     getWebPackageJson(repoUrl: string, branch: string | undefined, callback: (packageJson?: any) => Promise<void>): Promise<{}>;
     downloadWebProjectZip(repoUrl: string, branch: string | undefined, sourceFolderPath: string): Promise<{}>;
     extractProjectZip(repoUrl: string, branch: string | undefined, sourceFolderPath: string): void;
-    getNewestGitHubCommit(callback: (data?: {
+    getNewestGitHubCommit(repoUrl: string, callback: (data?: {
         message: any;
         name: any;
         date: any;
     }) => Promise<void>): Promise<void>;
-    getGitHubCommits(callback: (data?: any) => Promise<void>): Promise<{}>;
+    getGitHubCommits(repoUrl: string, callback: (data?: any) => Promise<void>): Promise<{}>;
 }

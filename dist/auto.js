@@ -13,7 +13,7 @@ exports.automatic = function (_a) {
         sourceFolderPath = process.cwd();
     if (isNeedDefaultProcess == true || isNeedDefaultProcess == undefined) {
         updater.events.on(eventSignal_1.getEventSignal('newVersionDetected'), function (eventInfo) {
-            updater.getNewestGitHubCommit(function (data) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
+            updater.getNewestGitHubCommit(eventInfo.repoUrl, function (data) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
                 var message, commitDate, committerName, checkWaitTime, line, timerKnock, grantedCalback, deniedCallback;
                 return tslib_1.__generator(this, function (_a) {
                     if (!data)
@@ -117,11 +117,8 @@ exports.automatic = function (_a) {
     var webGitInfoCallback = function (webGitInfo) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
         var eventInfo;
         return tslib_1.__generator(this, function (_a) {
-            console.log('hi2?');
-            console.log(webGitInfo);
             if (webGitInfo.type != "git")
                 return [2 /*return*/];
-            console.log('hi3?');
             eventInfo = {
                 repoUrl: repoUrl,
                 sourceFolderPath: sourceFolderPath,
