@@ -1,1 +1,1 @@
-export declare const Logger: (log: any) => void;
+export declare const Logger: (log: any, noPrint?: boolean) => string;

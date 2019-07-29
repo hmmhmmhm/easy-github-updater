@@ -1,7 +1,6 @@
 import { Update } from './update/update'
 import { getEventSignal } from './update/eventSignal'
 import { Logger } from './logger'
-import path from 'path'
 import readline from 'readline'
 
 export const automatic = (
@@ -9,16 +8,22 @@ export const automatic = (
         waitTime = 10000,
         branch = 'master',
         repoUrl,
+
         sourceFolderPath,
         isNeedDefaultProcess,
-        rebase = false
+
+        force = false,
+        rebase = true,
+        keep = []
     }: {
-        waitTime: number,
-        branch: string,
-        repoUrl?: string,
-        sourceFolderPath: string,
-        isNeedDefaultProcess?: boolean,
+        waitTime: number
+        branch: string
+        repoUrl?: string
+        sourceFolderPath: string
+        isNeedDefaultProcess?: boolean
+        force: boolean
         rebase: boolean
+        keep: string[]
     }
 ) => {
     let updater = new Update()
@@ -54,11 +59,10 @@ export const automatic = (
                             eventInfo.branch,
                             eventInfo.sourceFolderPath
                         )
-                        return
                     }
 
                     if (checkWaitTime == null)
-                        checkWaitTime = 10000
+                        checkWaitTime = 5000
 
                     Logger('New updates of the application have been found at Github.')
                     Logger(`Repository URL: ${eventInfo.repoUrl}, Branch: ${eventInfo.branch}\r\n`)
@@ -141,11 +145,15 @@ export const automatic = (
                 if (updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic']) {
                     Logger(`START THE EXTRACT PROJECT ZIP... (${eventInfo.repoUrl}:${eventInfo.branch})`)
 
-                    updater.extractProjectZip(
-                        eventInfo.repoUrl,
-                        eventInfo.branch,
-                        eventInfo.sourceFolderPath
-                    )
+                    try{
+                        updater.extractProjectZip(
+                            eventInfo.repoUrl,
+                            eventInfo.branch,
+                            eventInfo.sourceFolderPath,
+                            rebase,
+                            keep
+                        )
+                    }catch(e){}
                 }
             })
 
@@ -189,7 +197,7 @@ export const automatic = (
             webVersion: webGitInfo.version
         }
 
-        if (!rebase && (webGitInfo.version == localGitInfo.version || webGitInfo.version == null)) {
+        if (!force && (webGitInfo.version == localGitInfo.version || webGitInfo.version == null)) {
             updater.events.emit(
                 getEventSignal('alreadyHighestVersion'),
                 eventInfo

@@ -24,10 +24,9 @@ exports.automatic = function (_a) {
                         checkWaitTime = updater.saveOptions[eventInfo.repoUrl + ":" + eventInfo.branch][waitTime];
                     if (checkWaitTime === 0) {
                         updater.downloadWebProjectZip(eventInfo.repoUrl, eventInfo.branch, eventInfo.sourceFolderPath);
-                        return [2 /*return*/];
                     }
                     if (checkWaitTime == null)
-                        checkWaitTime = 10000;
+                        checkWaitTime = 5000;
                     logger_1.Logger('New updates of the application have been found at Github.');
                     logger_1.Logger("Repository URL: " + eventInfo.repoUrl + ", Branch: " + eventInfo.branch + "\r\n");
                     logger_1.Logger("Installed Application Version: " + eventInfo.localVersion);
@@ -90,7 +89,10 @@ exports.automatic = function (_a) {
                 return;
             if (updater.saveOptions[eventInfo.repoUrl + ":" + eventInfo.branch]['automatic']) {
                 logger_1.Logger("START THE EXTRACT PROJECT ZIP... (" + eventInfo.repoUrl + ":" + eventInfo.branch + ")");
-                updater.extractProjectZip(eventInfo.repoUrl, eventInfo.branch, eventInfo.sourceFolderPath, rebase, keep);
+                try {
+                    updater.extractProjectZip(eventInfo.repoUrl, eventInfo.branch, eventInfo.sourceFolderPath, rebase, keep);
+                }
+                catch (e) { }
             }
         });
         updater.events.on(eventSignal_1.getEventSignal('projectExtractComplete'), function (eventInfo) {

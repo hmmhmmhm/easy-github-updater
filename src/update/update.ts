@@ -1,11 +1,53 @@
 import Event from 'events'
+import NestedFolder from 'nested-static'
 import path from 'path'
 import url from 'url'
-import http from 'http'
 import https from 'https'
-import fs from 'fs'
+import fs, { readdirSync } from 'fs-extra'
 import { getEventSignal } from './eventSignal'
 import admZip from 'adm-zip'
+import wildcard from 'wildcard'
+
+export interface IPathsType {
+    subPath: string
+    staticPath: string
+    filePath: string
+    fileName: string
+}
+
+export const collectFilePaths
+:(folderPath: string) => Promise<IPathsType[]> =
+
+async (
+    folderPath: string
+) => {
+
+    // Search all of the child folders
+    return new Promise((resolve)=>{
+        NestedFolder(folderPath, async (folders)=>{
+            let data: IPathsType[] = []
+
+            for(let folder of folders){
+                let files = fs.readdirSync(folder.staticPath)
+
+                // Search all of the files
+                for(let file of files){
+                    let filePath = folder.staticPath + '/' + file
+                    let stats = fs.statSync(filePath)
+                    if(stats.isDirectory()) continue
+
+                    data.push({
+                        subPath: folder.subPath,
+                        staticPath: folder.staticPath,
+                        filePath,
+                        fileName: file
+                    })
+                }
+            }
+            resolve(data)
+        })
+    })
+}
 
 export class Update {
     events: Event
@@ -87,150 +129,166 @@ export class Update {
     ){
         if (repoUrl[repoUrl.length - 1] != '/') repoUrl += '/'
         let packageJsonUrl = url.resolve(repoUrl, `${branch}/package.json`)
-        let parsedPackageJsonUrl = url.parse(packageJsonUrl)
+        packageJsonUrl = packageJsonUrl.replace('github.com/', 'raw.githubusercontent.com/')
 
-        let protocol: null
-        | typeof http
-        | typeof https
-            = null
-
-        switch (parsedPackageJsonUrl.protocol) {
-        case 'http:':
-            protocol = http
-            break
-            case 'https:':
-            protocol = https
-            break
-        }
-        parsedPackageJsonUrl.host = 'raw.githubusercontent.com'
         let packageJson = ''
 
         return new Promise(async (resolve)=>{
-            if(!protocol){
-                await callback(undefined)
-                resolve()
-                return
-            }
-            protocol.get(
-                url.format(parsedPackageJsonUrl),
-                response => {
-                    response.on('data', chunk => {
-                        packageJson += chunk
-                    })
-                    response.on('end', async () => {
-                        await callback(JSON.parse(packageJson))
-                        resolve()
-                    })
-                }
-            )
+            let request = https.request(packageJsonUrl, (response) => {
+                response.on('data', (chunk) => {
+                    packageJson += chunk
+                })
+                response.on("end", async () => {
+                    await callback(JSON.parse(packageJson))
+                    resolve()
+                })
+                response.on('error', async () => {
+                    await callback()
+                    resolve()
+                })
+            })
+            request.end()
         })
     }
 
-    async downloadWebProjectZip(
+    downloadWebProjectZip(
         repoUrl: string,
         branch: string = 'master',
         sourceFolderPath: string
     ){
 
         if (repoUrl[repoUrl.length - 1] != '/') repoUrl += '/'
-        let projectZipUrl = url.resolve(repoUrl, `zip/${branch}`)
-        let parsedProjectZipUrl = url.parse(projectZipUrl)
 
-        let protocol: null
-        | typeof http
-        | typeof https
-            = null
+        let projectZipUrl = url.resolve(repoUrl, `zip/${branch}`)
+        projectZipUrl = projectZipUrl.replace('github.com/', 'codeload.github.com/')
 
         if (fs.existsSync(path.join(sourceFolderPath, `_${branch}.zip`)))
             fs.unlinkSync(path.join(sourceFolderPath, `_${branch}.zip`))
 
-        switch (parsedProjectZipUrl.protocol) {
-        case 'http:':
-            protocol = http
-                break
-            case 'https:':
-            protocol = https
-                break
-        }
-
-        return new Promise((resolve)=>{
-            parsedProjectZipUrl.host = 'codeload.github.com'
-            if (protocol !== null) {
-                protocol.get(url.format(parsedProjectZipUrl), (response) => {
-    
-                    let eventInfo = {
-                        repoUrl: repoUrl,
-                        sourceFolderPath: sourceFolderPath,
-                        branch: branch
-                    }
-
-                    this.events.emit(
-                        getEventSignal('projectDownloadStart'),
-                        eventInfo
-                    )
-
-                    let file = fs.createWriteStream(path.join(sourceFolderPath, `_${branch}.zip`))
-                    let contentLength = 0
-                    let currentLength = 0
-
-                    if(response.headers['content-length'])
-                        contentLength =
-                            parseInt(response.headers['content-length'], 10)
-
-                    response.pipe(file)
-
-                    response.on('data', (chunk) => {
-                        currentLength += chunk.length
-                        let percentage = (100.0 * (currentLength / contentLength)).toFixed(2)
-    
-                        this.events.emit(
-                            getEventSignal('projectDownloadProgress'),
-                            percentage,
-                            eventInfo
-                        )
-                    })
-    
-                    response.on('end', () => {
-                        file.end()
-                    })
-    
-                    file.on('finish', () => {
-                        this.events.emit(
-                            getEventSignal('projectDownloadEnd'),
-                            eventInfo
-                        )
-                        resolve()
-                    })
-
-                    response.on('error', () => {
-                        resolve()
-                    })
-                })
+        let request = https.request(projectZipUrl, (response) => {
+            let eventInfo = {
+                repoUrl: repoUrl,
+                sourceFolderPath: sourceFolderPath,
+                branch: branch
             }
+
+            this.events.emit(
+                getEventSignal('projectDownloadStart'),
+                eventInfo
+            )
+
+            let file = fs.createWriteStream(path.join(sourceFolderPath, `_${branch}.zip`))
+            let contentLength = 0
+            let currentLength = 0
+
+            if(response.headers['content-length'])
+                contentLength =
+                    parseInt(response.headers['content-length'], 10)
+
+            let pipe = response.pipe(file)
+
+            response.on('data', (chunk) => {
+                currentLength += chunk.length
+                let percentage = (100.0 * (currentLength / contentLength)).toFixed(2)
+
+                this.events.emit(
+                    getEventSignal('projectDownloadProgress'),
+                    percentage,
+                    eventInfo
+                )
+            })
+            response.on('end', ()=>{
+                this.events.emit(
+                    getEventSignal('projectDownloadEnd'),
+                    eventInfo
+                )
+            })
         })
+        request.end()
     }
 
     extractProjectZip(
         repoUrl: string,
         branch: string = 'master',
-        sourceFolderPath: string
+        sourceFolderPath: string,
+        rebase: boolean = true,
+        keep: string[] = []
     ){
-        let zip = new admZip(path.join(sourceFolderPath, `_${branch}.zip`))
-        let zipEntries = zip.getEntries() // an array of ZipEntry records
 
-        zip.extractEntryTo(zipEntries[0], sourceFolderPath, false, true)
-        fs.unlinkSync(path.join(sourceFolderPath, `_${branch}.zip`))
+        // COLLECT BEFORE FILE LISTS
+        let fieldName = `_updatedata_${branch}`
+        setTimeout(async ()=>{
+            try{
+                let zip = new admZip(path.join(sourceFolderPath, `_${branch}.zip`))
+                let zipEntries = zip.getEntries() // an array of ZipEntry records
+                zip.extractAllTo(`${sourceFolderPath}/${fieldName}`, /*overwrite*/true)
+    
+                let subFile = readdirSync(`${sourceFolderPath}/${fieldName}`)
+    
+                let before = await collectFilePaths(`${sourceFolderPath}/${fieldName}/${subFile[0]}`)
+    
+                await fs.copySync(`${sourceFolderPath}/${fieldName}/${subFile[0]}`, sourceFolderPath)
+                await fs.unlinkSync(path.join(sourceFolderPath, `_${branch}.zip`))
+                await fs.remove(`${sourceFolderPath}/${fieldName}`)
+    
+                // COLLECT AFTER FILE LISTS
+                let after = await collectFilePaths(sourceFolderPath)
+    
+                let diff: IPathsType[] = []
+                for(let afterItem of after){
+                    let isLegacyFile = true
+                    for(let beforeItem of before){
+                        if(beforeItem.subPath == afterItem.subPath
+                            && beforeItem.fileName == afterItem.fileName){
+    
+                            isLegacyFile = false
+                            break
+                        }
+                    }
+    
+                    if(isLegacyFile) diff.push(afterItem)
+                }
+    
+                for(let diffItem of diff){
+    
+                    // rebase 옵션이 참인 경우 diffItem.staticPath 다 지우기
+                    if(rebase){
+    
+                        // keep 목록이 있는 경우
+                        // keep 에 통과되는 `${subPath}${fileName}` 만 안 지우기
+                        let isKeepItem = false
+                        if(Array.isArray(keep)){
+                            for(let keepItem of keep){
+    
+                                if(wildcard(keepItem, `${diffItem.subPath}${diffItem.fileName}`)){
+                                    isKeepItem = true
+                                    break
+                                }
+                            }
+                        }
+    
+                        // diffItem.staticPath 다 지우기
+                        if(!isKeepItem) await fs.unlinkSync(`${diffItem.staticPath}/${diffItem.fileName}`)
+                    }
+                }
+            }catch(e){
+                try{
+                    await fs.unlinkSync(path.join(sourceFolderPath, `_${branch}.zip`))
+                    await fs.remove(`${sourceFolderPath}/${fieldName}`)
+                }catch(e){}
+            }
 
-        let eventInfo = {
-            repoUrl: repoUrl,
-            sourceFolderPath: sourceFolderPath,
-            branch: branch
-        }
+            let eventInfo = {
+                repoUrl: repoUrl,
+                sourceFolderPath: sourceFolderPath,
+                branch: branch
+            }
 
-        this.events.emit(
-            getEventSignal('projectExtractComplete'),
-            eventInfo
-        )
+            this.events.emit(
+                getEventSignal('projectExtractComplete'),
+                eventInfo
+            )
+        }, 1000)
     }
 
     async getNewestGitHubCommit(repoUrl: string, callback: (data?: {message, name, date}) => Promise<void>) {
