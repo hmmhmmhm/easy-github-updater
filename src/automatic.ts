@@ -16,14 +16,14 @@ export const automatic = (
         rebase = true,
         keep = []
     }: {
-        waitTime: number
-        branch: string
+        waitTime?: number
+        branch?: string
         repoUrl?: string
-        sourceFolderPath: string
+        sourceFolderPath?: string
         isNeedDefaultProcess?: boolean
-        force: boolean
-        rebase: boolean
-        keep: string[]
+        force?: boolean
+        rebase?: boolean
+        keep?: string[]
     }
 ) => {
     let updater = new Update()
@@ -62,7 +62,7 @@ export const automatic = (
                     }
 
                     if (checkWaitTime == null)
-                        checkWaitTime = 5000
+                        checkWaitTime = waitTime
 
                     Logger('New updates of the application have been found at Github.')
                     Logger(`Repository URL: ${eventInfo.repoUrl}, Branch: ${eventInfo.branch}\r\n`)

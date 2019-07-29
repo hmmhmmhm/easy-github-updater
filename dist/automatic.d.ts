@@ -1,10 +1,10 @@
 export declare const automatic: ({ waitTime, branch, repoUrl, sourceFolderPath, isNeedDefaultProcess, force, rebase, keep }: {
-    waitTime: number;
-    branch: string;
+    waitTime?: number | undefined;
+    branch?: string | undefined;
     repoUrl?: string | undefined;
-    sourceFolderPath: string;
+    sourceFolderPath?: string | undefined;
     isNeedDefaultProcess?: boolean | undefined;
-    force: boolean;
-    rebase: boolean;
-    keep: string[];
+    force?: boolean | undefined;
+    rebase?: boolean | undefined;
+    keep?: string[] | undefined;
 }) => void;

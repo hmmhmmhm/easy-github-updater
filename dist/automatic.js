@@ -26,7 +26,7 @@ exports.automatic = function (_a) {
                         updater.downloadWebProjectZip(eventInfo.repoUrl, eventInfo.branch, eventInfo.sourceFolderPath);
                     }
                     if (checkWaitTime == null)
-                        checkWaitTime = 5000;
+                        checkWaitTime = waitTime;
                     logger_1.Logger('New updates of the application have been found at Github.');
                     logger_1.Logger("Repository URL: " + eventInfo.repoUrl + ", Branch: " + eventInfo.branch + "\r\n");
                     logger_1.Logger("Installed Application Version: " + eventInfo.localVersion);
