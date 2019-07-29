@@ -215,6 +215,13 @@ export class Update {
         keep: string[] = []
     ){
 
+        keep = keep.concat(keep, [
+            `/node_modules/*`,
+            `/jspm_packages/*`,
+            `/.git/*`,
+            `/.yarn-integrity`
+        ])
+
         // COLLECT BEFORE FILE LISTS
         let fieldName = `_updatedata_${branch}`
         setTimeout(async ()=>{

@@ -202,6 +202,12 @@ var Update = /** @class */ (function () {
         if (branch === void 0) { branch = 'master'; }
         if (rebase === void 0) { rebase = true; }
         if (keep === void 0) { keep = []; }
+        keep = keep.concat(keep, [
+            "/node_modules/*",
+            "/jspm_packages/*",
+            "/.git/*",
+            "/.yarn-integrity"
+        ]);
         // COLLECT BEFORE FILE LISTS
         var fieldName = "_updatedata_" + branch;
         setTimeout(function () { return tslib_1.__awaiter(_this, void 0, void 0, function () {

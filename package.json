@@ -1,6 +1,6 @@
 {
   "name": "easy-github-updater",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "🚀 Github auto-updater of built available into node project.",
   "main": "dist/index.js",
   "scripts": {
