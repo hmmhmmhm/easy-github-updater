@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import Event from 'events';
 export interface IPathsType {
     subPath: string;
@@ -19,7 +20,7 @@ export declare class Update {
         type: string;
         version: string;
     }) => Promise<void>): Promise<void>;
-    getWebPackageJson(repoUrl: string, branch: string | undefined, callback: (packageJson?: any) => Promise<void>): Promise<{}>;
+    getWebPackageJson(repoUrl: string, branch: string | undefined, callback: (packageJson?: any) => Promise<void>): Promise<unknown>;
     downloadWebProjectZip(repoUrl: string, branch: string | undefined, sourceFolderPath: string): void;
     extractProjectZip(repoUrl: string, branch: string | undefined, sourceFolderPath: string, rebase?: boolean, keep?: string[]): void;
     getNewestGitHubCommit(repoUrl: string, callback: (data?: {
@@ -27,5 +28,5 @@ export declare class Update {
         name: any;
         date: any;
     }) => Promise<void>): Promise<void>;
-    getGitHubCommits(repoUrl: string, callback: (data?: any) => Promise<void>): Promise<{}>;
+    getGitHubCommits(repoUrl: string, callback: (data?: any) => Promise<void>): Promise<unknown>;
 }

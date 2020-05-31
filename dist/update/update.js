@@ -1,5 +1,4 @@
 "use strict";
-var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
 var events_1 = tslib_1.__importDefault(require("events"));
@@ -11,12 +10,11 @@ var fs_extra_1 = tslib_1.__importStar(require("fs-extra"));
 var eventSignal_1 = require("./eventSignal");
 var adm_zip_1 = tslib_1.__importDefault(require("adm-zip"));
 var wildcard_1 = tslib_1.__importDefault(require("wildcard"));
-exports.collectFilePaths = function (folderPath) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
-    var _this = this;
+exports.collectFilePaths = function (folderPath) { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
     return tslib_1.__generator(this, function (_a) {
         // Search all of the child folders
         return [2 /*return*/, new Promise(function (resolve) {
-                nested_static_1.default(folderPath, function (folders) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
+                nested_static_1.default(folderPath, function (folders) { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
                     var data, _i, folders_1, folder, files, _a, files_1, file, filePath, stats;
                     return tslib_1.__generator(this, function (_b) {
                         data = [];

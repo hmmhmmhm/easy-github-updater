@@ -1,5 +1,4 @@
 "use strict";
-var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
 var update_1 = require("./update/update");
@@ -13,7 +12,7 @@ exports.check = function (_a) {
             sourceFolderPath = process.cwd();
         if (isNeedDefaultProcess == true || isNeedDefaultProcess == undefined) {
             updater.events.on(eventSignal_1.getEventSignal('newVersionDetected'), function (eventInfo) {
-                updater.getNewestGitHubCommit(eventInfo.repoUrl, function (data) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
+                updater.getNewestGitHubCommit(eventInfo.repoUrl, function (data) { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
                     var message, commitDate, committerName, encodedMessage;
                     return tslib_1.__generator(this, function (_a) {
                         if (!data) {
@@ -51,7 +50,7 @@ exports.check = function (_a) {
             repoUrl += '/';
         if (branch === undefined)
             branch = 'master';
-        var webGitInfoCallback = function (webGitInfo) { return tslib_1.__awaiter(_this, void 0, void 0, function () {
+        var webGitInfoCallback = function (webGitInfo) { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
             var eventInfo;
             return tslib_1.__generator(this, function (_a) {
                 if (webGitInfo.type != "git") {

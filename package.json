@@ -12,18 +12,18 @@
   "author": "hmmhmmhm",
   "license": "See LICENSE.md File",
   "dependencies": {
-    "folder-logger": "^1.0.0",
-    "wildcard": "^2.0.0",
-    "adm-zip": "^0.4.13",
+    "adm-zip": "^0.4.14",
+    "folder-logger": "^1.0.9",
     "fs-extra": "^8.1.0",
-    "nested-static": "^1.1.0"
+    "nested-static": "^1.1.0",
+    "wildcard": "^2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^12.6.8",
+    "@types/node": "^12.12.42",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
-    "eslint": "^6.1.0",
-    "ts-node": "^8.0.3"
+    "eslint": "^6.8.0",
+    "ts-node": "^8.10.2"
   },
   "repository": {
     "type": "git",

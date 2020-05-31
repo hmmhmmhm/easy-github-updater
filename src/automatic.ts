@@ -37,7 +37,7 @@ export const automatic = (
             (eventInfo) => {
                 updater.getNewestGitHubCommit(eventInfo.repoUrl, async (data) => {
 
-                    if(!data) return
+                    if (!data) return
 
                     let {
                         message,
@@ -50,7 +50,7 @@ export const automatic = (
                      */
                     let checkWaitTime: number | null = null
 
-                    if (typeof(updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]) != 'undefined')
+                    if (typeof (updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]) != 'undefined')
                         checkWaitTime = updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`][waitTime]
 
                     if (checkWaitTime === 0) {
@@ -75,7 +75,7 @@ export const automatic = (
                     Logger(`Comitter: ${committerName}`)
                     Logger(`CommitDate: ${commitDate}\r\n`)
 
-                    Logger(`If you do not select, it will be launch ${(checkWaitTime/1000)} seconds after automatically.`)
+                    Logger(`If you do not select, it will be launch ${(checkWaitTime / 1000)} seconds after automatically.`)
                     Logger(`If want to update, please enter 'yes'.`)
                     Logger('(yes/no):')
 
@@ -84,15 +84,15 @@ export const automatic = (
                         output: process.stdout
                     })
 
-                    let timerKnock = 
+                    let timerKnock =
                         setTimeout(() => {
                             grantedCalback()
                         },
-                        checkWaitTime)
+                            checkWaitTime)
 
                     let grantedCalback = () => {
-                        if(timerKnock) clearTimeout(timerKnock)
-                        if(line) line.close()
+                        if (timerKnock) clearTimeout(timerKnock)
+                        if (line) line.close()
 
                         updater.downloadWebProjectZip(
                             eventInfo.repoUrl,
@@ -102,8 +102,8 @@ export const automatic = (
                     }
 
                     let deniedCallback = () => {
-                        if(timerKnock) clearTimeout(timerKnock)
-                        if(line) line.close()
+                        if (timerKnock) clearTimeout(timerKnock)
+                        if (line) line.close()
                         updater.events.emit(
                             getEventSignal('startCallback'),
                             eventInfo
@@ -128,11 +128,11 @@ export const automatic = (
                 })
             }
         )
-        
+
         updater.events.on(
             getEventSignal('projectDownloadStart'),
             (eventInfo) => {
-                if (typeof(updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic']) == 'undefined') return
+                if (typeof (updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic']) == 'undefined') return
 
                 if (updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic'])
                     Logger(`START THE DOWNLOAD PROJECT FILE... (${eventInfo.repoUrl}:${eventInfo.branch})`)
@@ -141,11 +141,11 @@ export const automatic = (
         updater.events.on(
             getEventSignal('projectDownloadEnd'),
             (eventInfo) => {
-                if (typeof(updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic']) == 'undefined') return
+                if (typeof (updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic']) == 'undefined') return
                 if (updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic']) {
                     Logger(`START THE EXTRACT PROJECT ZIP... (${eventInfo.repoUrl}:${eventInfo.branch})`)
 
-                    try{
+                    try {
                         updater.extractProjectZip(
                             eventInfo.repoUrl,
                             eventInfo.branch,
@@ -153,14 +153,14 @@ export const automatic = (
                             rebase,
                             keep
                         )
-                    }catch(e){}
+                    } catch (e) { }
                 }
             })
 
         updater.events.on(
             getEventSignal('projectExtractComplete'),
             (eventInfo) => {
-                if (typeof(updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic']) == 'undefined')
+                if (typeof (updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic']) == 'undefined')
                     return
 
                 if (updater.saveOptions[`${eventInfo.repoUrl}:${eventInfo.branch}`]['automatic'])
